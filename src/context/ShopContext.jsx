@@ -46,7 +46,7 @@ const INITIAL_PRODUCTS = [
  },
  {
  id: "adapt-sports-bra-004",
- name: "ADAPT SPORTS BRA",
+ name: "Relaxed Sports",
  price: 45.00,
  category: "WOMEN",
  fit: "REGULAR FIT",
@@ -54,7 +54,7 @@ const INITIAL_PRODUCTS = [
  color: "BLUE",
  image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDEO9jFAqNe1O72qhDvSyzmWKIvpoPlGrk2Shokle38ol-j5b3QR-E4hTS1ggIrIHFBCuBaV-ESgN0Pke4cDvrHygY65MMO5CdpTwRP8pNgwUDmPVt5tONNYLvwLbpWj_30L6Jtj-HOXUfMFHqqTBjGGMMR9eMsRVGwx9R5AHEamMtLEfH6X6x9FDR-RHWesL8wZY2Yhcgg57qVFsHB4wdOTVR--3zDCZMhpphqG7jkNeDF6-D17fXeAUiFjsl1EYVPRznOEd-iDdk",
  sizes: ["XS", "S", "M", "L"],
- description: "Medium support for maximum effort. The Adapt Sports Bra features sweat-wicking fabric and a secure underband for reliable workouts.",
+ description: "Medium support for maximum effort. The Relaxed Sports features sweat-wicking fabric and a secure underband for reliable workouts.",
  stock: 120
  },
  {
