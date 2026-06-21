@@ -20,7 +20,7 @@ const INITIAL_PRODUCTS = [
  },
  {
  id: "vital-seamless-002",
- name: "VITAL SEAMLESS LEGGINGS",
+ name: "Relaxed Oversized",
  price: 55.00,
  category: "WOMEN",
  fit: "SLIM FIT",
@@ -33,7 +33,7 @@ const INITIAL_PRODUCTS = [
  },
  {
  id: "oversized-hoodie-003",
- name: "REST DAY OVERSIZED HOODIE",
+ name: "Off Shoulder Oversized",
  price: 65.00,
  category: "MEN",
  fit: "OVERSIZED",
