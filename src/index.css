@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Strongsoul Light Cream Theme */
+  --color-background: #F3F4ED;
+  --color-void-black: #FFFFFF; 
+  --color-structure-gray: #E5E7EB;
+  --color-pure-white: #1A1A1A; /* Text color mapped here so existing classes flip to dark */
+  --color-brand-accent: #FDE047; /* Strongsoul Yellow */
+  --color-surface: #F3F4ED;
+  --color-surface-dim: #EAEBDE;
+  --color-surface-bright: #FFFFFF;
+  --color-surface-variant: #FFFFFF;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-low: #FAFAFA;
+  --color-surface-container: #F3F4ED;
+  --color-surface-container-high: #EAEBDE;
+  --color-surface-container-highest: #E5E7EB;
+  --color-on-surface: #1A1A1A;
+  --color-on-surface-variant: #6B7280;
+  --color-outline: #E5E7EB;
+  --color-primary: #1A1A1A;
+  --color-on-primary: #F3F4ED;
+  --color-secondary: #4B5563;
+  --color-on-secondary: #F3F4ED;
+}
+
+@keyframes marquee {
+ 0% { transform: translateX(0); }
+ 100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+ animation: marquee 25s linear infinite;
+}
+
+.grid-lines {
+ background-size: 40px 40px;
+ background-image: linear-gradient(to right, var(--color-structure-gray) 1px, transparent 1px),
+ linear-gradient(to bottom, var(--color-structure-gray) 1px, transparent 1px);
+}
+
+.glass-panel {
+ background: rgba(var(--color-surface-container-rgb, 18, 18, 20), 0.7);
+ backdrop-filter: blur(12px);
+ -webkit-backdrop-filter: blur(12px);
+ border: 1px solid rgba(255, 255, 255, 0.05);
+ box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.material-symbols-outlined {
+ font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+ display: inline-block;
+ vertical-align: middle;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+ width: 4px;
+ height: 4px;
+}
+::-webkit-scrollbar-track {
+ background: var(--color-void-black);
+}
+::-webkit-scrollbar-thumb {
+ background: var(--color-structure-gray);
+}
+::-webkit-scrollbar-thumb:hover {
+ background: var(--color-brand-accent);
+}
+
+/* Product grid */
+.product-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+ gap: 1px;
+ background-color: var(--color-structure-gray);
+}
+
+.product-card {
+ background-color: var(--color-void-black);
+ transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Accordions for PDP */
+.accordion-content {
+ max-height: 0;
+ overflow: hidden;
+ transition: max-height 0.3s ease-out;
+}
+.accordion-open .accordion-content {
+ max-height: 300px;
+}
+.accordion-open .chevron {
+ transform: rotate(180deg);
+}
+
+.active-size {
+ background-color: var(--color-brand-accent) !important;
+ color: var(--color-pure-white) !important;
+}
+
+@keyframes slideIn {
+ from { transform: translateX(100%); }
+ to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+ from { transform: translateX(-100%); }
+ to { transform: translateX(0); }
+}
+
+.animate-slide-in {
+ animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-left {
+ animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
