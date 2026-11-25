@@ -69,7 +69,7 @@ export default function Header() {
           </div>
 
           <Link to="/" className="flex items-center gap-1.5 sm:gap-2.5" aria-label="Street Emotion home">
-            <img src={mark} alt="" width="40" height="40" className="h-7 w-7 flex-shrink-0 rounded-full bg-ink object-cover sm:h-10 sm:w-10" />
+            <img src={mark} alt="" width="40" height="40" className="h-7 w-7 flex-shrink-0 rounded-full object-contain sm:h-10 sm:w-10" />
             <span className="wordmark whitespace-nowrap text-[11px] min-[360px]:text-xs min-[400px]:text-sm sm:text-base lg:text-[17px]">Street Emotion</span>
           </Link>
 

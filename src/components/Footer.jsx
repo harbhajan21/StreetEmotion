@@ -33,7 +33,7 @@ export default function Footer() {
 
       <div className="page grid gap-12 py-12 lg:grid-cols-12 lg:py-14">
         <div className="lg:col-span-5">
-          <img src={mark} alt="Street Emotion logo" width="64" height="65" className="h-12 w-12 rounded-full bg-ink object-cover" loading="lazy" />
+          <img src={mark} alt="Street Emotion logo" width="64" height="64" className="h-12 w-12 rounded-full object-contain" loading="lazy" />
           <p className="t-h3 mt-5 max-w-sm">If something doesn’t last the way it should, we want to hear it from you first.</p>
           <Link to="/contact" className="link mt-4 inline-flex min-h-[44px] items-center font-medium">Talk to us</Link>
         </div>
