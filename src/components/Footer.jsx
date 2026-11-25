@@ -1,90 +1,57 @@
-import React, { useState, useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShopContext } from '../context/ShopContext';
+import { Package, RotateCcw, Ruler } from 'lucide-react';
+import mark from '../assets/logo-mark.webp';
+import { formatPrice } from '../context/ShopContext';
+import { BRAND } from '../data/brand';
+import { CATEGORIES } from '../data/catalog';
+
+const COLUMNS = [
+  ['Shop', [['Shop all', '/products'], ...CATEGORIES.map((c) => [c.label, `/products?style=${c.id}`])]],
+  ['Help', [['Contact', '/contact'], ['Returns', '/refund'], ['Your orders', '/profile'], ['Wishlist', '/wishlist']]],
+  ['Street Emotion', [['Our story', '/about'], ['Join the list', '/signup']]],
+];
+
+const FACTS = [
+  [Package, `Free shipping over ${formatPrice(BRAND.freeShippingOver)}`, '/products'],
+  [RotateCcw, '14-day returns on eligible items', '/refund'],
+  [Ruler, 'Fabric and fit on every product', '/products'],
+];
 
 export default function Footer() {
- const [subscribed, setSubscribed] = useState(false);
- const [email, setEmail] = useState('');
- const { setComingSoonOpen } = useContext(ShopContext);
-
- const handleSubscribe = (e) => {
- e.preventDefault();
- if (email.trim()) {
- setSubscribed(true);
- setEmail('');
- }
- };
-
   return (
-    <footer className="w-full px-4 md:px-margin-desktop py-16 flex flex-col gap-12 bg-surface-dim border-t border-structure-gray shadow-[inset_0_20px_20px_-20px_rgba(0,0,0,0.05)] text-on-surface">
-      <div className="flex flex-col lg:flex-row justify-between items-start gap-12 border-b border-structure-gray pb-12">
-        {/* Brand & Newsletter */}
-        <div className="flex flex-col gap-6 max-w-lg w-full">
-          <div className="font-display-xl text-[40px] md:text-[56px] text-on-surface leading-[0.9] tracking-tighter uppercase font-extrabold mb-2">
-            STREET<br/><span className="text-brand-accent">EMOTION</span>
-          </div>
-          <p className="font-body-lg text-sm text-on-surface-variant max-w-sm">
-            {subscribed ? "YOU ARE IN THE NETWORK. ACCESS GRANTED." : "JOIN THE NETWORK. GET EARLY ACCESS TO DROPS & EXCLUSIVE OFFERS."}
-          </p>
-          {!subscribed && (
-            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full mt-2">
-              <input 
-                type="email" 
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-grow bg-structure-gray/20 border border-structure-gray font-mono-ui text-sm px-5 py-4 focus:ring-0 focus:border-brand-accent placeholder:text-on-surface-variant text-on-surface transition-all outline-none" 
-                placeholder="ENTER EMAIL ADDRESS" 
-              />
-              <button type="submit" className="bg-brand-accent text-on-surface px-8 py-4 font-label-caps text-sm tracking-widest font-bold hover:brightness-110 transition-all uppercase whitespace-nowrap active:scale-[0.98]">
-                SIGN UP
-              </button>
-            </form>
-          )}
-        </div>
+    <footer className="border-t border-line bg-bone">
+      <div className="border-b border-line">
+        <ul className="page grid sm:grid-cols-3">
+          {FACTS.map(([Icon, text, to], i) => (
+            <li key={text} className={i ? 'border-t border-line sm:border-l sm:border-t-0 sm:pl-6' : ''}>
+              <Link to={to} className="flex min-h-[60px] text-[15px] items-center gap-3 font-medium hover:underline"><Icon size={20} className="flex-shrink-0" />{text}</Link>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-        {/* Links Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-10 md:gap-16 w-full lg:w-auto text-sm font-body-md text-on-surface">
-          <div className="flex flex-col gap-4">
-            <h4 className="font-label-caps text-xs tracking-widest text-on-surface-variant mb-1 font-bold">SHOP</h4>
-            <Link className="hover:text-brand-accent transition-all" to="/products?category=MEN">MEN</Link>
-            <Link className="hover:text-brand-accent transition-all" to="#" onClick={(e) => { e.preventDefault(); setComingSoonOpen(true); }}>WOMEN</Link>
-            <Link className="hover:text-brand-accent transition-all" to="#" onClick={(e) => { e.preventDefault(); setComingSoonOpen(true); }}>ACCESSORIES</Link>
-            <Link className="hover:text-brand-accent transition-all" to="/products">NEW RELEASES</Link>
-          </div>
-          <div className="flex flex-col gap-4">
-            <h4 className="font-label-caps text-xs tracking-widest text-on-surface-variant mb-1 font-bold">HELP</h4>
-            <Link className="hover:text-brand-accent transition-all" to="/contact">FAQ</Link>
-            <Link className="hover:text-brand-accent transition-all" to="/refund">DELIVERY & RETURNS</Link>
-            <Link className="hover:text-brand-accent transition-all" to="/contact">TRACK ORDER</Link>
-            <Link className="hover:text-brand-accent transition-all" to="/contact">CONTACT US</Link>
-          </div>
-          <div className="flex flex-col gap-4">
-            <h4 className="font-label-caps text-xs tracking-widest text-on-surface-variant mb-1 font-bold">ABOUT</h4>
-            <Link className="hover:text-brand-accent transition-all" to="/about">OUR STORY</Link>
-            <Link className="hover:text-brand-accent transition-all" to="/refund">PRIVACY POLICY</Link>
-            <Link className="hover:text-brand-accent transition-all" to="/refund">TERMS OF SERVICE</Link>
-          </div>
+      <div className="page grid gap-12 py-12 lg:grid-cols-12 lg:py-14">
+        <div className="lg:col-span-5">
+          <img src={mark} alt="Street Emotion logo" width="64" height="65" className="h-12 w-12 rounded-full bg-ink object-cover" loading="lazy" />
+          <p className="t-h3 mt-5 max-w-sm">If something doesn’t last the way it should, we want to hear it from you first.</p>
+          <Link to="/contact" className="link mt-4 inline-flex min-h-[44px] items-center font-medium">Talk to us</Link>
+        </div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-6 lg:col-start-7">
+          {COLUMNS.map(([heading, links]) => (
+            <nav key={heading} aria-label={heading}>
+              <h2 className="mb-2 text-[15px] font-semibold">{heading}</h2>
+              {links.map(([label, to]) => <Link key={label} to={to} className="block py-1.5 text-[15px] text-stone hover:text-ink hover:underline">{label}</Link>)}
+              {heading === 'Street Emotion' && BRAND.instagram && <a href={BRAND.instagram} target="_blank" rel="noreferrer" className="block py-1.5 text-[15px] text-stone hover:text-ink hover:underline">Instagram</a>}
+            </nav>
+          ))}
         </div>
       </div>
 
-      {/* Footer Bottom */}
-      <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-6 text-on-surface-variant font-mono-ui text-xs">
-        <div className="flex items-center gap-6">
-          <p>© {new Date().getFullYear()} STREET EMOTION. ALL RIGHTS RESERVED.</p>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="flex gap-4">
-            {/* Social Icons mock */}
-            <a href="#" className="hover:text-brand-accent transition-colors"><span className="material-symbols-outlined text-[20px]">photo_camera</span></a>
-            <a href="#" className="hover:text-brand-accent transition-colors"><span className="material-symbols-outlined text-[20px]">smart_display</span></a>
-            <a href="#" className="hover:text-brand-accent transition-colors"><span className="material-symbols-outlined text-[20px]">alternate_email</span></a>
-          </div>
-          <div className="h-4 w-px bg-structure-gray/50"></div>
-          <div className="flex gap-2 items-center">
-            <span className="material-symbols-outlined text-[24px]">verified_user</span>
-            <span className="font-label-caps text-[10px] tracking-widest font-bold">SECURE CHECKOUT</span>
-          </div>
+      <div className="border-t border-line">
+        <div className="page flex flex-wrap justify-between gap-x-6 gap-y-1 py-5 text-sm text-stone">
+          <p>© {new Date().getFullYear()} Street Emotion</p>
+          <p>Men’s streetwear, priced in Indian rupees</p>
         </div>
       </div>
     </footer>

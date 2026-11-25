@@ -1,229 +1,124 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ShopContext } from '../context/ShopContext';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Heart } from 'lucide-react';
+import { ProductGrid } from '../components/ProductCard';
+import SizePicker from '../components/SizePicker';
+import { formatPrice, useShop } from '../context/ShopContext';
+import { BRAND } from '../data/brand';
+import { categoryLabel, fitLabel, moodLabel } from '../data/catalog';
+
+function Section({ title, open, children }) {
+  return (
+    <details className="group border-b border-line" open={open}>
+      <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between font-semibold [&::-webkit-details-marker]:hidden">
+        {title}<span className="text-xl font-normal group-open:rotate-45" aria-hidden="true">+</span>
+      </summary>
+      <div className="space-y-2 pb-5 text-stone">{children}</div>
+    </details>
+  );
+}
 
 export default function ProductDetail() {
- const { id } = useParams();
- const navigate = useNavigate();
- const { products, addToCart } = useContext(ShopContext);
- 
- const [product, setProduct] = useState(null);
- const [selectedSize, setSelectedSize] = useState('M');
- const [activeAccordion, setActiveAccordion] = useState('');
- const [addedNotify, setAddedNotify] = useState(false);
+  const { id } = useParams();
+  const { products, addToCart, canAdd, wishlist, toggleWishlist, setPanel } = useShop();
+  const product = products.find((p) => p.id === id);
+  const [size, setSize] = useState('');
+  const [image, setImage] = useState(0);
 
- useEffect(() => {
- const found = products.find(p => p.id === id);
- if (found) {
- setProduct(found);
- // Preselect first size if available
- if (found.sizes && found.sizes.length > 0) {
- setSelectedSize(found.sizes[0]);
- }
- }
- }, [id, products]);
+  useEffect(() => { setSize(''); setImage(0); }, [id]);
 
- if (!product) {
- return (
- <div className="min-h-screen bg-background flex flex-col items-center justify-center text-pure-white p-8">
- <span className="material-symbols-outlined text-6xl text-structure-gray mb-4">search_off</span>
- <h2 className="font-display-lg text-2xl uppercase mb-2 font-bold">PRODUCT NOT FOUND</h2>
- <p className="font-mono-ui text-xs text-on-surface-variant mb-6 text-center max-w-xs">
- The requested product could not be found or is no longer available.
- </p>
- <Link to="/products" className="border border-brand-accent text-brand-accent px-6 py-3 font-mono-ui text-xs uppercase hover:bg-brand-accent hover:text-void-black transition-all font-bold">
- CONTINUE SHOPPING
- </Link>
- </div>
- );
- }
+  if (!product) {
+    return (
+      <div className="page py-28">
+        <h1 className="t-h1">We don’t have that one</h1>
+        <p className="mb-8 mt-4 text-stone">It may have been removed from the shop.</p>
+        <Link to="/products" className="btn-ink">Shop all</Link>
+      </div>
+    );
+  }
 
- const handleAddToCart = () => {
- addToCart(product, selectedSize);
- setAddedNotify(true);
- setTimeout(() => {
- setAddedNotify(false);
- }, 3000);
- };
+  const saved = wishlist.includes(product.id);
+  const available = canAdd(product.id);
+  const pairs = products.filter((p) => p.id !== product.id && p.style !== product.style)
+    .sort((a, b) => Number(b.mood === product.mood) - Number(a.mood === product.mood)).slice(0, 4);
+  const label = !available ? 'No more in stock' : size ? 'Add to bag' : 'Choose a size';
 
- const toggleAccordion = (name) => {
- setActiveAccordion(prev => prev === name ? '' : name);
- };
+  return (
+    <div className="pb-28 lg:pb-0">
+      <div className="page grid gap-8 pt-4 lg:grid-cols-12 lg:gap-14 lg:pt-8">
+        <div className="-mx-4 sm:mx-0 lg:col-span-7">
+          <img src={product.images[image]} alt={`${product.name} in ${product.color}`} className="aspect-[4/5] w-full rounded-none bg-line sm:rounded lg:max-h-[780px] object-cover" />
+          {product.images.length > 1 && (
+            <div className="mt-3 flex gap-3 px-4 sm:px-0">
+              {product.images.map((src, i) => (
+                <button key={src} type="button" onClick={() => setImage(i)} aria-label={`Photo ${i + 1}`} aria-pressed={image === i} className={`w-20 rounded border ${image === i ? 'border-ink' : 'border-transparent'}`}>
+                  <img src={src} alt="" className="aspect-[3/4] w-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
- const isSoldOut = product.stock === 0;
+        <div className="lg:sticky lg:top-24 lg:col-span-5 lg:self-start lg:pb-16">
+          <nav className="mb-4 text-sm text-stone" aria-label="Breadcrumb">
+            <Link to="/products" className="hover:text-ink">Shop</Link> / <Link to={`/products?style=${product.style}`} className="hover:text-ink">{categoryLabel(product.style)}</Link>
+          </nav>
+          <h1 className="t-h1">{product.name}</h1>
+          <p className="mt-2 text-lg font-medium">{formatPrice(product.price)}</p>
+          <p className="mt-5 max-w-prose">{product.description}</p>
 
- return (
- <div className="min-h-screen bg-background text-pure-white">
- {/* Category Sidebar Navigation Portal - Desktop */}
- <aside className="hidden lg:flex fixed left-0 top-[65px] h-[calc(100vh-65px)] flex-col border-r border-structure-gray z-40 bg-background w-64">
- <div className="p-6 border-b border-structure-gray">
- <h3 className="font-headline-lg text-[24px] text-pure-white uppercase font-bold">CATEGORIES</h3>
- </div>
- <div className="flex flex-col flex-grow font-bold">
- <Link to="/products" className="text-pure-white p-4 border-b border-structure-gray font-mono-ui uppercase hover:bg-structure-gray transition-all">ALL PRODUCTS</Link>
- <Link to="/products?category=MEN" className={`p-4 border-b border-structure-gray font-mono-ui uppercase hover:bg-structure-gray transition-all ${product.category === 'MEN' ? 'text-brand-accent' : ''}`}>MEN</Link>
- <Link to="/products?category=WOMEN" className={`p-4 border-b border-structure-gray font-mono-ui uppercase hover:bg-structure-gray transition-all ${product.category === 'WOMEN' ? 'text-brand-accent' : ''}`}>WOMEN</Link>
- <Link to="/products?category=BOYS" className={`p-4 border-b border-structure-gray font-mono-ui uppercase hover:bg-structure-gray transition-all ${product.category === 'BOYS' ? 'text-brand-accent' : ''}`}>BOYS</Link>
- <Link to="/products?category=GIRLS" className={`p-4 border-b border-structure-gray font-mono-ui uppercase hover:bg-structure-gray transition-all ${product.category === 'GIRLS' ? 'text-brand-accent' : ''}`}>GIRLS</Link>
- <Link to="/products?category=ACCESSORIES" className={`p-4 border-b border-structure-gray font-mono-ui uppercase hover:bg-structure-gray transition-all ${product.category === 'ACCESSORIES' ? 'text-brand-accent' : ''}`}>ACCESSORIES</Link>
- </div>
- <div className="p-4 border-t border-structure-gray">
- <button onClick={() => navigate('/products')} className="w-full text-left font-mono-ui text-xs uppercase underline tracking-widest hover:text-brand-accent">
- BACK TO ALL
- </button>
- </div>
- </aside>
+          <dl className="my-7 grid grid-cols-3 border-y border-line">
+            {[['Weight', product.gsm || '–'], ['Fit', fitLabel(product.fit)], ['Mood', moodLabel(product.mood)]].map(([k, v], i) => (
+              <div key={k} className={`py-4 ${i ? 'border-l border-line pl-4' : ''}`}><dt className="text-sm text-stone">{k}</dt><dd className="mt-0.5 font-medium">{v}</dd></div>
+            ))}
+          </dl>
 
- {/* Main Content Grid */}
- <main className="lg:ml-64 flex flex-col md:flex-row">
- {/* Left: Image Stack */}
- <section className="w-full md:w-2/3 border-b md:border-b-0 md:border-r border-structure-gray flex flex-col">
- <div className="w-full border-b border-structure-gray">
- <img 
- className="w-full aspect-[3/4] object-cover brightness-90 hover:-0 transition-all duration-700" 
- alt={`${product.name} Front Details`}
- src={product.image}
- />
- </div>
- <div className="w-full border-b border-structure-gray">
- {/* Alt image 2: Mocked matching detail image */}
- <img 
- className="w-full aspect-[3/4] object-cover brightness-90 hover:-0 transition-all duration-700" 
- alt={`${product.name} Texture Stitching`}
- src={product.image} // Re-using standard premium image for simplicity & styling consistency
- />
- </div>
- </section>
+          <SizePicker sizes={product.sizes} value={size} onChange={setSize} onGuide={() => setPanel('size')} />
+          <div className="mt-4 hidden gap-2 lg:flex">
+            <button type="button" className="btn-ink flex-grow" disabled={!size || !available} onClick={() => addToCart(product, size)}>{label}</button>
+            <button type="button" className="btn-line !px-4" onClick={() => toggleWishlist(product.id)} aria-pressed={saved} aria-label="Save to wishlist"><Heart size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+          </div>
 
- {/* Right: Sticky Info Container */}
- <section className="w-full md:w-1/3 p-6 md:p-margin-desktop sticky top-[65px] self-start h-[calc(100vh-65px)] overflow-y-auto flex flex-col gap-8">
- <div className="flex flex-col gap-2">
- <div className="flex justify-between items-start gap-4">
- <h2 className="font-headline-lg text-2xl md:text-headline-lg uppercase leading-none max-w-[70%] font-bold">
- {product.name}
- </h2>
- <span className="font-display-lg text-[20px] md:text-[24px] text-pure-white font-bold">
- ${product.price.toFixed(2)}
- </span>
- </div>
- <p className="font-mono-ui text-xs text-on-surface-variant uppercase tracking-widest font-bold">
- {product.fit} | {product.color}
- </p>
- <div className="flex gap-2 mt-2 flex-wrap">
- <span className="bg-structure-gray/50 border border-structure-gray text-pure-white text-[10px] uppercase px-2 py-1 font-bold tracking-widest flex items-center gap-1">
- <span className="material-symbols-outlined text-[14px]">fitness_center</span>
- {product.fit.toUpperCase()}
- </span>
- <span className="bg-structure-gray/50 border border-structure-gray text-pure-white text-[10px] uppercase px-2 py-1 font-bold tracking-widest flex items-center gap-1">
- <span className="material-symbols-outlined text-[14px]">local_fire_department</span>
- PREMIUM FABRIC
- </span>
- </div>
- </div>
+          <div className="mt-8 border-t border-line">
+            <Section title="Details" open>
+              <p>{product.fabric}. {product.color}.</p>
+              <ul className="list-disc pl-5">{product.details.map((d) => <li key={d}>{d}</li>)}</ul>
+            </Section>
+            <Section title="Make it last">
+              <ul className="list-disc pl-5">
+                <li>Turn it inside out and wash cold with similar colours.</li>
+                <li>Skip the bleach and go easy on detergent.</li>
+                <li>Dry it in the shade. Heat and direct sun speed up fading.</li>
+                <li>Always follow the care label if it says something different.</li>
+              </ul>
+            </Section>
+            <Section title="Shipping and returns">
+              <p>Shipping is {formatPrice(BRAND.shippingFee)}, and free over {formatPrice(BRAND.freeShippingOver)}.</p>
+              <p><Link to="/refund" className="link">Read the returns policy</Link></p>
+            </Section>
+          </div>
+        </div>
+      </div>
 
- {/* Size Select */}
- {!isSoldOut ? (
- <div className="flex flex-col gap-4">
- <div className="flex justify-between items-end">
- <label className="font-mono-ui text-xs uppercase text-pure-white font-bold">SELECT SIZE</label>
- <span className="font-label-caps text-[10px] uppercase text-brand-accent underline underline-offset-4 tracking-widest cursor-pointer hover:text-pure-white">
- [ SIZE GUIDE ]
- </span>
- </div>
- <div className="grid grid-cols-5 gap-px bg-structure-gray border border-structure-gray">
- {product.sizes.map(size => (
- <button 
- key={size}
- onClick={() => setSelectedSize(size)}
- className={`bg-background aspect-square flex items-center justify-center font-mono-ui font-bold hover:bg-structure-gray transition-all ${selectedSize === size ? 'active-size' : ''}`}
- >
- {size}
- </button>
- ))}
- </div>
- </div>
- ) : (
- <div className="border border-structure-gray p-4 bg-structure-gray/20 flex items-center gap-3">
- <span className="material-symbols-outlined text-on-surface-variant">inventory_2</span>
- <div>
- <p className="font-mono-ui text-xs uppercase font-bold text-on-surface-variant">OUT OF STOCK</p>
- <p className="text-[10px] text-on-surface-variant mt-0.5">This item is currently unavailable.</p>
- </div>
- </div>
- )}
+      <section className="page py-16 lg:py-20">
+        <h2 className="t-h2 mb-6">Wear it with</h2>
+        <ProductGrid products={pairs} />
+      </section>
 
- {/* Add Notification */}
- {addedNotify && (
- <div className="border border-brand-accent p-4 bg-brand-accent/5 flex items-center justify-between animate-fadeIn">
- <div className="flex items-center gap-3">
- <span className="material-symbols-outlined text-brand-accent">check_circle</span>
- <span className="font-mono-ui text-xs uppercase">ADDED TO SHOPPING BAG</span>
- </div>
- <Link to="/cart" className="font-mono-ui text-[10px] text-brand-accent underline uppercase font-bold">View Bag</Link>
- </div>
- )}
-
- {/* Action Trigger */}
- <button 
- disabled={isSoldOut}
- onClick={handleAddToCart}
- className={`w-full py-6 font-display-lg text-lg uppercase tracking-tighter transition-all duration-300 ${isSoldOut ? 'bg-structure-gray text-on-surface-variant cursor-not-allowed' : 'bg-brand-accent text-pure-white hover:brightness-110 active:scale-[0.98] font-bold'}`}
- >
- {isSoldOut ? 'SOLD OUT' : 'ADD TO BAG'}
- </button>
-
- {/* Accordion Sections */}
- <div className="flex flex-col mt-4 gap-2">
- {/* Accordion 1 */}
- <div className={`accordion-item bg-structure-gray/20 px-5 rounded-sm border border-structure-gray/50 ${activeAccordion === 'fabric' ? 'accordion-open' : ''}`}>
- <button 
- onClick={() => toggleAccordion('fabric')}
- className="w-full py-5 flex justify-between items-center group text-left"
- >
- <span className="font-mono-ui text-sm uppercase tracking-widest group-hover:text-brand-accent transition-all font-bold">
- DESCRIPTION
- </span>
- <span className="material-symbols-outlined transition-transform duration-300 chevron">
- expand_more
- </span>
- </button>
- <div className="accordion-content">
- <div className="pb-5 text-xs text-on-surface-variant font-body-md leading-relaxed space-y-2">
- <p>{product.description}</p>
- <p className="mt-2">- {product.fit}</p>
- <p>- Premium sweat-wicking materials</p>
- <p>- 4-Way stretch for ultimate performance</p>
- <p>- Model is 6'0" and wears size M</p>
- <p className="mt-4 text-[10px] italic">SKU: {product.id.toUpperCase()}</p>
- </div>
- </div>
- </div>
-
- {/* Accordion 2 */}
- <div className={`accordion-item bg-structure-gray/20 px-5 rounded-sm border border-structure-gray/50 ${activeAccordion === 'shipping' ? 'accordion-open' : ''}`}>
- <button 
- onClick={() => toggleAccordion('shipping')}
- className="w-full py-5 flex justify-between items-center group text-left"
- >
- <span className="font-mono-ui text-sm uppercase tracking-widest group-hover:text-brand-accent transition-all font-bold">
- DELIVERY &amp; RETURNS
- </span>
- <span className="material-symbols-outlined transition-transform duration-300 chevron">
- expand_more
- </span>
- </button>
- <div className="accordion-content">
- <div className="pb-5 text-xs text-on-surface-variant font-body-md leading-relaxed">
- <p className="font-bold text-pure-white">Free Standard Delivery over $100</p>
- <p className="mt-1 mb-4">Standard Delivery: 3-5 working days.</p>
- <p className="font-bold text-pure-white">Free Returns</p>
- <p className="mt-1">You can return your order for any reason, free of charge, within 30 days.</p>
- </div>
- </div>
- </div>
- </div>
- </section>
- </main>
- </div>
- );
+      <div className="fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-bone p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+        <button
+          type="button"
+          className="btn-ink flex-grow"
+          disabled={!available}
+          onClick={() => {
+            if (size) addToCart(product, size);
+            else document.querySelector('fieldset')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          }}
+        >
+          {label}
+        </button>
+        <button type="button" className="btn-line !px-4" onClick={() => toggleWishlist(product.id)} aria-pressed={saved} aria-label="Save to wishlist"><Heart size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+      </div>
+    </div>
+  );
 }
